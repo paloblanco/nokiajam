@@ -1,0 +1,260 @@
+<html>
+
+  <head>
+
+    <meta name = "viewport" content = "width=device-width">
+    <title>PoP Vlog - Control</title>
+    <style>
+    
+        * {
+
+        box-sizing:border-box;
+        margin:0;
+        padding:0;
+
+        }
+
+        html, body {
+
+        height:100%;
+        width:100%;
+
+        }
+
+        body {
+
+        align-content:space-around;
+        background-color:#c7f0d8;
+        color:#43523d;
+        display:grid;
+        justify-content:center;
+
+        }
+
+        canvas {
+
+        background-color:#ffffff;
+        image-rendering:pixelated;
+        border: 1px solid black;
+
+        }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <h1>PoP Vlog - Control</h1>
+
+    <canvas></canvas>
+
+    <p>Use the keyboard to move the red square.</p>
+
+    <script>
+    
+    // Frank Poth 08/13/2017
+
+/*
+################
+DECLARATIONS
+################
+*/
+
+var context, controller, rectangle, loop, update, draw, ctx, offCanvas, pixelRatio;
+var baseheight, basewidth, basescale, colors;
+
+
+
+/*
+################
+CANVAS SETUP
+################
+*/
+
+baseheight = 48;
+basewidth = 84;
+basescale = 6;
+targetheight = baseheight*basescale;
+targetwidth = basewidth*basescale;
+pixelRatio = window.devicePixelRatio;
+
+//OFFSCREEN CANVAS
+
+offCanvas = document.createElement("canvas");
+offCanvas.width = basewidth;
+offCanvas.height = baseheight;
+ctx = offCanvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+context = document.querySelector("canvas").getContext("2d");
+context.canvas.height = targetheight * pixelRatio;
+context.canvas.style.height = '${targetheight}px'
+context.canvas.width = targetwidth * pixelRatio;
+context.canvas.style.width = '${targetwidth}px'
+context.scale(basescale*pixelRatio, basescale*pixelRatio);
+context.imageSmoothingEnabled = false;
+
+colors = ["#c7f0d8", "#43523d"];
+
+
+/*
+################
+CONTROLLER
+################
+*/
+
+controller = {
+
+left:false,
+right:false,
+up:false,
+keyListener:function(event) {
+  var key_state = (event.type == "keydown")?true:false;
+  switch(event.keyCode) {
+    case 37:// left key
+      controller.left = key_state;
+    break;
+    case 38:// up key
+      controller.up = key_state;
+    break;
+    case 39:// right key
+      controller.right = key_state;
+    break;
+  }
+}
+};
+
+/*
+################
+ENTITY CREATION
+################
+*/
+
+rectangle = {
+
+  height:8,
+  jumping:true,
+  width:8,
+  x:42, // center of the canvas
+  x_velocity:0,
+  x_draw:0,
+  y:0,
+  y_velocity:0,
+  y_draw:0,
+
+};
+
+/*
+################
+UPDATE
+################
+*/
+
+update = function() {
+    if (controller.up && rectangle.jumping == false) {
+        rectangle.y_velocity -= 2.5;
+        rectangle.jumping = true;
+    }
+
+    if (controller.left) {
+        rectangle.x_velocity -= 0.5;
+    }
+
+    if (controller.right) {
+        rectangle.x_velocity += 0.5;
+    }
+
+    rectangle.y_velocity += 0.125;// gravity
+    rectangle.x += rectangle.x_velocity;
+    rectangle.y += rectangle.y_velocity;
+    rectangle.x_velocity *= 0.2;// friction
+    //rectangle.y_velocity *= 0.2;// friction
+
+    // if rectangle is falling below floor line
+    if (rectangle.y > 48 - 4 - 8) {
+        rectangle.jumping = false;
+        rectangle.y = 48 - 4 - 8;
+        rectangle.y_velocity = 0;
+    }
+
+    // if rectangle is going off the left of the screen
+    if (rectangle.x < -8) {
+        rectangle.x = 84;
+    } else if (rectangle.x > 84) {// if rectangle goes past right boundary
+        rectangle.x = -8;
+    }
+
+    rectangle.x_draw = Math.floor(rectangle.x);
+    rectangle.y_draw = Math.floor(rectangle.y);
+
+    }
+
+/*
+################
+DRAW
+################
+*/
+
+draw = function() {
+    ctx.fillStyle = colors[0];
+    ctx.fillRect(0, 0, 84, 48);// x, y, width, height
+    ctx.fillStyle = colors[1];// hex for red
+    
+    ctx.fillRect(rectangle.x_draw, rectangle.y_draw, rectangle.width, rectangle.height);
+    
+    ctx.fillStyle = colors[1];
+
+    ctx.fillRect(0,44,84,1);
+
+    // ctx.lineWidth = 1;
+    // ctx.beginPath();
+    // ctx.moveTo(0, 44);
+    // ctx.lineTo(84, 44);
+    // ctx.stroke();
+
+    
+
+    context.drawImage(offCanvas,0,0);//,basescale*84,basescale*48);
+}
+
+/*
+################
+MAIN LOOP
+################
+*/
+let i=0;
+
+loop = function() {
+
+  update();
+
+    if (i==3) {
+      
+      draw();
+    }
+
+    // call update when the browser is ready to draw again
+    window.requestAnimationFrame(loop);
+
+    i++;
+    i = i%4;
+
+};
+
+/*
+################
+SET UP LISTENERS AND START!
+################
+*/
+
+window.addEventListener("keydown", controller.keyListener);
+window.addEventListener("keyup", controller.keyListener);
+window.requestAnimationFrame(loop);
+
+    </script>
+
+  </body>
+
+</html>
+
