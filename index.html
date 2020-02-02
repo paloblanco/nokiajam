@@ -3,7 +3,7 @@
   <head>
 
     <meta name = "viewport" content = "width=device-width">
-    <title>PoP Vlog - Control</title>
+    <title>Phoenix Escape</title>
     <style>
     
         * {
@@ -45,12 +45,13 @@
 
   <body>
 
-    <h1>PoP Vlog - Control</h1>
+    <h1>Phoenix Escape</h1>
 
     <canvas></canvas>
 
-    <p>Use the keyboard to move the red square.</p>
+    <p>CLick, space, or tap to play! Escape the dungeon! Embrace your fiery death to be reborn and try again!</p>
 
+    
     <script>
     
     // Frank Poth 08/13/2017
@@ -84,6 +85,7 @@ pixelRatio = window.devicePixelRatio;
 offCanvas = document.createElement("canvas");
 offCanvas.width = basewidth;
 offCanvas.height = baseheight;
+offCanvas.style.imageRendering = "pixelated";
 ctx = offCanvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
@@ -97,6 +99,32 @@ context.imageSmoothingEnabled = false;
 
 colors = ["#c7f0d8", "#43523d"];
 
+
+/*
+################
+PRINTING SPRITE FONT
+################
+*/
+
+// FIX SPRITE SHEET
+var font_sheet = new Image();
+font_sheet.src = "pico8_font.png";
+
+var print = function(str, x, y) {
+  str = str.toUpperCase();
+  for (let ii=0; ii < str.length; ii++) {
+    let xsheet, ysheet;
+    let char = str[ii].charCodeAt(0);
+    if (char < 65) {
+      ysheet = 24;
+      xsheet = (char - 48)*8;
+    } else {
+      ysheet = 48 + 8*Math.floor((char - 64)/16);
+      xsheet = ((char - 64)%16)*8;
+    };
+    ctx.drawImage(font_sheet,xsheet,ysheet,8,8,x+4*ii,y,8,8);
+  }
+}
 
 /*
 ################
@@ -207,14 +235,13 @@ draw = function() {
 
     ctx.fillRect(0,44,84,1);
 
-    // ctx.lineWidth = 1;
-    // ctx.beginPath();
-    // ctx.moveTo(0, 44);
-    // ctx.lineTo(84, 44);
-    // ctx.stroke();
-
+    ctx.font = "8px Arial";
+    // ctx.fillStyle = "red";
+    ctx.textAlign = "left";
     
-
+    ctx.fillText("HELLO WORLD", 12, 28);
+    print("Score: 752", 12,28);
+    
     context.drawImage(offCanvas,0,0);//,basescale*84,basescale*48);
 }
 
