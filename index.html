@@ -123,7 +123,11 @@ var print = function(str, x, y) {
     };
     ctx.drawImage(font_sheet,xsheet,ysheet,8,8,x+4*ii,y,8,8);
   }
-}
+};
+
+//loading other images
+var sprite_sheet = new Image();
+sprite_sheet.src = "phoenix_nokia.png";
 
 /*
 ################
@@ -228,8 +232,8 @@ draw = function() {
     ctx.fillRect(0, 0, 84, 48);// x, y, width, height
     ctx.fillStyle = colors[0];// hex for red
     
-    ctx.fillRect(rectangle.x_draw, rectangle.y_draw, rectangle.width, rectangle.height);
-    
+    //ctx.fillRect(rectangle.x_draw, rectangle.y_draw, rectangle.width, rectangle.height);
+    ctx.drawImage(sprite_sheet,0,0,16,16,rectangle.x_draw, rectangle.y_draw,16,16);
     ctx.fillStyle = colors[0];
 
     ctx.fillRect(0,44,84,1);
